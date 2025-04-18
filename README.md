@@ -1,3 +1,3 @@
 # gc_detector
 
-HDBCAN-based globular cluster detection tool
+HDBSCAN-based globular cluster detection tool.
