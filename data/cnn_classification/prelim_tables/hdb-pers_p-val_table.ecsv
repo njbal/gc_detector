@@ -1,0 +1,11 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: Cluster Name, datatype: string}
+# - {name: hdb_pers, datatype: float64}
+# - {name: p-value, datatype: float64}
+# schema: astropy-2.0
+"Cluster Name" hdb_pers p-value
+"Pal 5" 0.22866680609194623 1.2132832583715902e-146
+"NGC 5904" 0.2656084003119112 0.0
+Eridanus 0.3056759198948788 3.7636212765598266e-11

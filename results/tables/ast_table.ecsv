@@ -1,0 +1,21 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: Cluster Name, datatype: string}
+# - {name: '$N_{\rm mem}$', datatype: int64}
+# - {name: '$R_{50}$', unit: deg, datatype: float64}
+# - {name: $\alpha$, unit: deg, datatype: float64}
+# - {name: $\delta$, unit: deg, datatype: float64}
+# - {name: $l$, unit: deg, datatype: float64}
+# - {name: $b$, unit: deg, datatype: float64}
+# - {name: $\varpi$, unit: mas, datatype: float64}
+# - {name: $u(\varpi)$, unit: mas, datatype: float64}
+# - {name: '$\mu_{\alpha^*}$', unit: mas / yr, datatype: float64}
+# - {name: '$u(\mu_{\alpha^*})$', unit: mas / yr, datatype: float64}
+# - {name: '$\mu_{\delta}$', unit: mas / yr, datatype: float64}
+# - {name: '$u(\mu_{\delta})$', unit: mas / yr, datatype: float64}
+# schema: astropy-2.0
+"Cluster Name" "$N_{\rm mem}$" $R_{50}$ $\alpha$ $\delta$ $l$ $b$ $\varpi$ $u(\varpi)$ $\mu_{\alpha^*}$ $u(\mu_{\alpha^*})$ $\mu_{\delta}$ $u(\mu_{\delta})$
+Eridanus 35 0.02 66.188503 -21.187914 218.108607 -41.329798 0.178 0.047 0.493 0.05 -0.338 0.057
+"NGC 5904" 8402 0.129 229.636524 2.078439 3.854038 46.796122 0.135 0.012 4.059 0.022 -9.857 0.022
+"Pal 5" 277 0.055 229.016241 -0.121101 0.836049 45.858 0.042 0.02 -2.695 0.032 -2.69 0.03

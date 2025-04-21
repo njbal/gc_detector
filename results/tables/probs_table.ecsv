@@ -1,0 +1,13 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: Cluster Name, datatype: string}
+# - {name: '$p_{\rm class}$', datatype: float64}
+# - {name: '${min\_cluster\_size}$', datatype: int8}
+# - {name: '$p_{\rm hdb}$', datatype: float64}
+# - {name: '$p_{\rm CST}$', datatype: float64}
+# schema: astropy-2.0
+"Cluster Name" "$p_{\rm class}$" ${min\_cluster\_size}$ "$p_{\rm hdb}$" "$p_{\rm CST}$"
+Eridanus 0.9999803900718689 10 0.3056759198948788 3.7636212765598266e-11
+"NGC 5904" 0.9999287724494934 11 0.2656084003119112 0.0
+"Pal 5" 0.9983526468276978 13 0.22866680609194623 1.2132832583715902e-146
