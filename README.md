@@ -24,4 +24,5 @@ This work makes use of several packages including, but not limited to:
 - `scikit-learn` 1.3.0
 - `scipy` 1.11.1
 - `tensorflow` 2.15.0
+
 [Links to packages above to be added soon]
