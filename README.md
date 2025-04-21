@@ -9,9 +9,10 @@ From Gaia DR3's astrometric and photometric data, our  can:
 - Perform a cluster significance test to determine/quantify the astrometric density contrast between members and the background;
 - Calculate distance, velocity dispersion (observed), and compute radial surface density profiles (to be added).   
 
-![Flow_chart.svg](Schematic of the framework):
+![Schematic of the framework](Flow_chart.svg):
 
 This work makes use of several packages including, but not limited to:
+- `astropy` 5.3.4
 - `corner` 2.2.3
 - `emcee` 3.1.4
 - `hdbscan` 0.8.33
