@@ -9,7 +9,8 @@ From Gaia DR3's astrometric and photometric data, our  can:
 - Perform a cluster significance test to determine/quantify the astrometric density contrast between members and the background;
 - Calculate distance, velocity dispersion (observed), and compute radial surface density profiles (to be added).   
 
-![Schematic of the framework](Flow_chart.svg):
+![Framework depiction](Flow_chart.svg)
+**Basic schematic of the framework**
 
 This work makes use of several packages including, but not limited to:
 - `astropy` 5.3.4
@@ -23,3 +24,30 @@ This work makes use of several packages including, but not limited to:
 - `scikit-learn` 1.3.0
 - `scipy` 1.11.1
 - `tensorflow` 2.15.0
+
+Below is  structure of the directories:
+
+gc_detector
+├── code
+│   ├── 4_32_epochs-25
+│   │   ├── assets
+│   │   └── variables
+│   └── __pycache__
+├── data
+│   ├── clustering
+│   │   ├── above_disc
+│   │   ├── below_disc
+│   │   ├── clus_info
+│   │   │   ├── labels
+│   │   │   └── pers
+│   │   └── data
+│   └── cnn_classification
+│       ├── cmd
+│       ├── npy_files
+│       ├── prelim_clus_mem_lists
+│       └── prelim_tables
+└── results
+    ├── clus_mem_lists
+    ├── tables
+    └── visualisations
+        └── four_panel
