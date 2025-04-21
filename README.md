@@ -29,47 +29,26 @@ Below is  structure of the directories:
 
 gc_detector
 
-├── code
-
+── code
 │   ├── 4_32_epochs-25
-
 │   │   ├── assets
-
 │   │   └── variables
-
 │   └── __pycache__
-
 ├── data
-
 │   ├── clustering
-
 │   │   ├── above_disc
-
 │   │   ├── below_disc
-
 │   │   ├── clus_info
-
 │   │   │   ├── labels
-
 │   │   │   └── pers
-
 │   │   └── data
-
 │   └── cnn_classification
-
 │       ├── cmd
-
 │       ├── npy_files
-
 │       ├── prelim_clus_mem_lists
-
 │       └── prelim_tables
 └── results
-
     ├── clus_mem_lists
-    
     ├── tables
-    
     └── visualisations
-    
         └── four_panel
