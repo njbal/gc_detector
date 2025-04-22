@@ -70,9 +70,7 @@ def gen_cmd(path_to_file, partition_sizes):
         all_pers = np.load(pers_path, allow_pickle=True)[()]
 #         prob_path = f'../data/clustering/clus_info/prob/{fname}_prob_{L}.npy'
 
-#         print(all_pers)
         for sd in ast_array_p: # sd - subdivision
-#             g, bp_rp = phot_array_p[sd].T
             for m in all_labels[sd]: # m - minclustersize used
                 labels = all_labels[sd][m]
                 unique_labels = set(labels)-{-1}
@@ -321,11 +319,11 @@ def gmm_membership(spec_clus, source_ids_dict, clus_mem_lists_path):
 def xmatch(clus_mem_lists_path):
     """Positionally matches our overdensities with known objects (e.g. GCs, OCs, dSphs)"""
     
-    vb21 = fits.open('vb21-gc.fit')[1].data
-    hr24 = fits.open('hr24-oc.fit')[1].data
-    dr20 = fits.open('dr20-dsph.fit')[1].data
+    vb21 = ascii.read('vb21-gc.ecsv')
+    hr24 = ascii.read('hr24-oc.ecsv')
+    dr20 = ascii.read('dr20-dsph.ecsv')
     vra, vdec = vb21['RAJ2000'], vb21['DEJ2000']
-    hra, hdec = hr24['RA_ICRS'], hr24['DE_ICRS']
+    hra, hdec = hr24['RAJ2000'], hr24['DEJ2000']
     dra, ddec = dr20['RAJ2000'], dr20['DEJ2000']
 
     vname = vb21['Name']
@@ -435,11 +433,6 @@ def cst(clus_mem_lists_path):
                     # Rescale data:
                     spec_ast_array_resc = rescale(spec_ast_array[:,:5])
 
-#                     # separate background from main cluster elements:
-#                     ind2 = np.isin(spec_ast_array[:,0], clus_l) & np.isin(spec_ast_array[:,1], clus_b)
-#                     back_array = spec_ast_array_resc[~ind2]
-#                     clus_array = spec_ast_array_resc[ind2]
-
                     comm_id, comm_ind1, comm_ind2 = np.intersect1d(clus_source_id, spec_source_id, return_indices=True)
                     back_array = np.delete(spec_ast_array_resc, comm_ind2, 0)
                     clus_array = spec_ast_array_resc[comm_ind2]
@@ -484,13 +477,3 @@ def cst(clus_mem_lists_path):
     clus_sig_table.write('../data/cnn_classification/prelim_tables/hdb-pers_p-val_table.ecsv', 
                          format='ascii.ecsv', overwrite=True)
     
-#     print('Final object names and tally:')
-#     counter = 0
-#     for cp in clus_sig_table:
-#     #     print(cp[0], cp[1])
-#         if cp[2]==99.0 or cp[2]>five_sig:
-#             continue
-#         else:
-#             counter+=1
-#             print(cp[0])
-#     print('Total number of objects:', counter)
