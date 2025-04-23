@@ -240,6 +240,7 @@ def plx_dist(file_path):
     # Plot the posterior distribution:
     fig = corner.corner(flat_samples, labels=[r"$D \rm [kpc]$"], quantiles=[0.16, 0.5, 0.84], show_titles=True,
                         title_fmt=".3f", title_kwargs={"fontsize":12}, label_kwargs={"fontsize": 16})
+    fig.tight_layout()
     plt.savefig(f'{save_dir}{clus_name}.png')
     plt.close()
 
