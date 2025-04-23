@@ -234,7 +234,7 @@ def plx_dist(file_path):
     # Extract samples:
     flat_samples = sampler.get_chain(discard=2000, thin=10, flat=True)
     
-    save_dir = '../results/visualisation/distances/parallax/'
+    save_dir = '../results/visualisations/distances/parallax/'
     ensure_dir(save_dir)
     
     # Plot the posterior distribution:
