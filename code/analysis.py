@@ -181,3 +181,72 @@ def corner_plot(file_path, samples, r_lower, r_upper):
     
     plt.close()
     
+def plx_dist(file_path):
+    """Returns median parallax-derived distance, and 1-sigma errors associated to 16th and 84th percentile distances"""
+    
+    # open file:
+    T = ascii.read(file_path)
+    
+    #extract cluster name:
+    clus_name = file_path.split('/')[-1][:-5]
+    
+    # select only high membership probability sources. In this case we use 90%
+    prob_ind = T['gmm_mem_prob']>0.9
+
+    T = T[prob_ind]
+
+    plx = np.array(T['parallax'])
+    eplx = np.array(T['e_parallax'])
+
+    def log_likelihood(D, plx, eplx):
+        model = 1 / D  # Model parallax = 1/distance
+        residuals = (plx - model) / eplx
+        return -0.5 * np.sum(np.log(2 * np.pi * eplx**2) + residuals**2)
+
+    def log_prior(D):
+        # Gamma distribution - similar to Bailer-Jones et al. (2021 
+        D_s = 9.14 # scale distance, corresponding to median distance of all GCs - reference Baumgardt and Vasiliev (2021)
+        if D>0:
+            return -np.log(2*D_s) - 2*np.log(D_s/D) - D/D_s
+        return -np.inf
+
+    def log_probability(D,plx, eplx):
+        lp = log_prior(D)
+        if not np.isfinite(lp):
+            return -np.inf
+        return lp + log_likelihood(D, plx, eplx)
+
+
+    # Set up MCMC sampler:
+    nwalkers = 10  # Number of MCMC walkers
+    ndim = 1  # We are only fitting distance D
+    nsteps = 10000  # Number of MCMC steps
+
+    # Initial positions: Start walkers near an initial guess (e.g., 1/plx)
+    initial_distances = 1 / (np.median(plx)) + 1e-4*np.random.randn(nwalkers)
+
+    initial_positions = np.abs(initial_distances[:, np.newaxis])  # Ensure positive distances
+
+    # Run MCMC:
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, args=(plx, eplx))
+    sampler.run_mcmc(initial_positions, nsteps, progress=True)
+
+    # Extract samples:
+    flat_samples = sampler.get_chain(discard=2000, thin=10, flat=True)
+    
+    save_dir = '../results/visualisation/distances/parallax/'
+    ensure_dir(save_dir)
+    
+    # Plot the posterior distribution:
+    fig = corner.corner(flat_samples, labels=[r"$D \rm [kpc]$"], quantiles=[0.16, 0.5, 0.84], show_titles=True,
+                        title_fmt=".3f", title_kwargs={"fontsize":12}, label_kwargs={"fontsize": 16})
+    plt.savefig(f'{save_dir}{clus_name}.png')
+    plt.close()
+
+    # Report the best-fit distance:
+    dist_median = np.median(flat_samples)
+    dist_err_low = dist_median - np.percentile(flat_samples, 16)
+    dist_err_high = np.percentile(flat_samples, 84) - dist_median
+    
+    return clus_name, dist_median, dist_err_low, dist_err_high
+
