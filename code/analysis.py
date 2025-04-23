@@ -1,3 +1,6 @@
+import sys
+sys.dont_write_bytecode = True
+
 from astropy.io import ascii
 import numpy as np
 import matplotlib.pyplot as plt

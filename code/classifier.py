@@ -2,6 +2,9 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppresses INFO (1), WARNING (2), and ERROR (3) messages
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Optional: turn off oneDNN custom ops if needed
 
+import sys
+sys.dont_write_bytecode = True
+
 import time
 import numpy as np
 import matplotlib.pyplot as plt
