@@ -336,7 +336,7 @@ def pm_mle(file_path):
     
     samples = run_emcee(pm, e_pm)
     
-    results_dir = f'../results/visualisations/vel_disp_fits/'
+    results_dir = f'../results/visualisations/pm_disp_fits/'
     ensure_dir(results_dir)
     
     med_vals = np.median(samples, axis=0)
