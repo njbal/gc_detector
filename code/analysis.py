@@ -10,6 +10,7 @@ import emcee
 import corner
 from matplotlib.backends.backend_pdf import PdfPages
 from tables_and_vis import ensure_dir
+import pandas as pd
 
 # Define King profile:
 def King(r, k, R_c, R_t, const):
@@ -254,3 +255,102 @@ def plx_dist(file_path):
     
     return clus_name, dist_median, dist_err_low, dist_err_high
 
+def pm_mle(file_path):
+    """
+    Computes the proper motion (PM) dispersion of a cluster.
+    
+    Parameters:
+    file_path : str or os.path() like
+                - Path to cluster membership list file
+    
+    Returns:
+    tuple (clus_name, disp_med, disp_err_lo, disp_err_hi)
+    - Cluster name, Median PM dispersion, and 1-sigma errors associated with 16th and 84 percentile values
+    
+    """
+    T = ascii.read(file_path)
+    clus_name = file_path.split('/')[-1][:-5]
+    
+    # select only high membership probability sources. In this case we use 90%
+    prob_ind = T['gmm_mem_prob']>0.9
+
+    T = T[prob_ind]
+    data = np.array(T['pmra', 'pmdec', 'e_pmra', 'e_pmdec'].to_pandas())
+
+    pm = np.sqrt(data[:,0]**2 + data[:,1]**2)
+    e_pm = np.sqrt( ( (data[:,0]*data[:,2])**2 + (data[:,1]*data[:,3])**2 )/ (pm**2) )
+
+    def log_likelihood(theta, mu, e_mu):
+        """
+        Log-likelihood function to estimate intrinsic proper motion dispersion.
+
+        Parameters:
+        theta : tuple (mu_bar, sigma_int)
+            - mu_bar: Mean proper motion (not needed for dispersion estimation)
+            - sigma_int: Intrinsic proper motion dispersion
+        mu : np.array
+            - Observed proper motions
+        e_mu : np.array
+            - Measurement uncertainties
+
+        Returns:
+        Log-likelihood value.
+        """
+        mu_bar, sigma_int = theta
+
+        # Ensure dispersion is positive
+        if sigma_int <= 0:
+            return -np.inf  
+
+        sigma_sys = 0.02
+        # Observed dispersion model
+        sigma_obs2 = sigma_int**2 + e_mu**2 + sigma_sys**2
+        log_like = -0.5 * np.sum(np.log(2 * np.pi * sigma_obs2) + (mu - mu_bar)**2 / (2 * sigma_obs2))
+
+        return log_like
+
+    def run_emcee(mu, e_mu, n_walkers=10, n_steps=5000):
+        """
+        Runs MCMC to estimate intrinsic proper motion dispersion.
+
+        Parameters:
+        mu : np.array - Observed proper motions
+        e_mu : np.array - Measurement uncertainties
+        n_walkers : int - Number of walkers
+        n_steps : int - Number of MCMC steps
+
+        Returns:
+        samples 
+        """
+        ndim = 2  # Parameters: mu_bar, sigma_int
+        initial_guesses = np.array([np.mean(mu), np.std(mu)])  # Start with observed mean and std
+
+        # Small random perturbations
+        pos = initial_guesses + 1e-4 * np.random.randn(n_walkers, ndim)  
+
+        sampler = emcee.EnsembleSampler(n_walkers, ndim, log_likelihood, args=(mu, e_mu))
+        sampler.run_mcmc(pos, n_steps, progress=True)
+        samples = sampler.get_chain(discard=1000, thin=10, flat=True)  # Discard burn-in & thin samples
+        
+        return samples
+    
+    samples = run_emcee(pm, e_pm)
+    
+    results_dir = f'../results/visualisations/vel_disp_fits/'
+    ensure_dir(results_dir)
+    
+    med_vals = np.median(samples, axis=0)
+    
+    fig = corner.corner(samples, labels = [r'$ \bar{\mu} \ \rm [mas \ yr^{-1}]$', r'$\sigma_\mu \ \rm [mas \ yr^{-1}]$'], 
+                        label_kwargs = {'fontsize':14}, quantiles = [0.16, 0.5, 0.84], truths=med_vals, smooth=True,
+                        show_titles=True, title_fmt='.3f')
+
+    fig.suptitle(f'{clus_name}', x = 0.75 , y=0.8, size=24)
+    plt.savefig(f'{results_dir}{clus_name}.png')
+    plt.close()
+
+    disp_med = np.percentile(samples, 50, axis = 0)[-1]
+    disp_err_lo = disp_med - np.percentile(samples, 16, axis = 0)[-1]
+    disp_err_hi = np.percentile(samples, 84, axis = 0)[-1] - disp_med
+    
+    return clus_name, disp_med, disp_err_lo, disp_err_hi

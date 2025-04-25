@@ -13,16 +13,14 @@ From Gaia DR3's astrometric and photometric data, our framework can:
 **Basic schematic of the framework**
 
 This work makes use of several packages including, but not limited to:
-- `astropy` 5.3.4
-- `corner` 2.2.3
-- `emcee` 3.1.4
-- `hdbscan` 0.8.33
-- `matplotlib` 3.7.2
-- `numpy` 1.24.3
-- `opencv-python` 4.9.0.80
-- `pandas` 2.0.3
-- `scikit-learn` 1.3.0
-- `scipy` 1.11.1
-- `tensorflow` 2.15.0
-
-[Links to packages above to be added soon]
+- [`astropy`](https://docs.astropy.org/en/stable/index.html) 5.3.4
+- [`corner`](https://corner.readthedocs.io/) 2.2.3
+- [`emcee`](https://emcee.readthedocs.io/) 3.1.4
+- [`hdbscan`](https://hdbscan.readthedocs.io/) 0.8.33
+- [`matplotlib`](https://matplotlib.org/stable/index.html) 3.7.2
+- [`numpy`](https://numpy.org/doc/stable/) 1.24.3
+- [`opencv-python`](https://docs.opencv.org/4.x/index.html) 4.9.0.80
+- [`pandas`](https://pandas.pydata.org/docs/) 2.0.3
+- [`scikit-learn`](https://scikit-learn.org/stable/) 1.3.0
+- [`scipy`](https://docs.scipy.org/doc/scipy/) 1.11.1
+- [`tensorflow`](https://www.tensorflow.org/api_docs) 2.15.0
