@@ -2,12 +2,12 @@
 
 This is a Python-based globular cluster detection framework, which makes of several machine learning algorithms such as [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/), [convolutional neural networks(CNN)](https://www.tensorflow.org/tutorials/images/cnn) and [Gaussian mixture models (GMM)](https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html). This repo is a supplement to the paper titled "Automated detection of globular clusters in _Gaia_ DR3: Proposal of 2 new moving group candidates" - [Baloyi et al. 2025](link/doi to be provided soon) . This work draws inspiration from the open cluster detection tool OCfinder by [Castro-Ginard et al. (2022)](https://ui.adsabs.harvard.edu/abs/2022A%26A...661A.118C/abstract) and related work by [Hunt and Reffert (2024)](https://ui.adsabs.harvard.edu/abs/2024A%26A...686A..42H/abstract).
 
-From Gaia DR3's astrometric and photometric data, our  can:
+From Gaia DR3's astrometric and photometric data, our framwork can:
 - Extract spatial overdensities via HDBSCAN;
 - Classify overdensities as GCs or noise from their corresponing CMDs (details in the paper), by means of a CNN;
 - Collect/tabulate the members of the recovered known GCs, newly found GC candidates or other known objects via GMM
 - Perform a cluster significance test to determine/quantify the astrometric density contrast between members and the background;
-- Calculate distance, velocity dispersion (observed), and compute radial surface density profiles (to be added).   
+- Calculate parallax-based distances, proper motion dispersions, and compute radial surface density profiles (to be added).   
 
 ![Framework depiction](Flow_chart.svg)
 **Basic schematic of the framework**
