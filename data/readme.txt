@@ -3,7 +3,7 @@ Data Info
 ==========
 The `clustering` directory contains 2 data files covering a region of 10deg*10deg:
 1. 0_10_40_50 ---> 0<l[deg]<10 and 40<b[deg]<50
-2. 210_220_-40_-50 ---> follows same format as above
+2. 210_220_-50_-40 ---> follows same format as above
 Depending on whether region is above the Galactic disc (i.e. b>0) or below (i.e. b<0), the files are located in the relevant subdirectories.
 The HDBSCAN labels and persistences are saved under clus_info. 
 The search algorithm partitions the search regions into smaller blocks of side lengths L=1deg, 2deg and 5deg.   
