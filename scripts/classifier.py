@@ -391,15 +391,14 @@ def xmatch(clus_mem_lists_path):
     print('N_dSph: ', dsph_num)
     print('N_cand: ', cand_num)
     
-    
 def cst(clus_mem_lists_path):
     """Performs cluster significance test on all clusters and candidates. Creates an associated data table."""
     unique_files = set()
     for x in np.sort(os.listdir(clus_mem_lists_path)):
         spl = x.split('_')
         fname = '{0}_{1}_{2}_{3}'.format(*spl[:4])
+        
         unique_files.add(fname)
-
 
     pval_array = []
     i = 0
@@ -441,7 +440,7 @@ def cst(clus_mem_lists_path):
                     clus_array = spec_ast_array_resc[comm_ind2]
 
                     
-                    if clus_array.shape[0]<11:
+                    if clus_array.shape[0]<k+1:
                         print(f'{clus_name}:insufficient no. of sources')
                         pval_array.append([clus_name, pers_val, 99])
                     else:

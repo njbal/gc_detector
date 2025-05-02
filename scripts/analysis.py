@@ -354,3 +354,28 @@ def pm_mle(file_path):
     disp_err_hi = np.percentile(samples, 84, axis = 0)[-1] - disp_med
     
     return clus_name, disp_med, disp_err_lo, disp_err_hi
+
+def bounds(n):
+    """Determines the lowest and highest nearest multiples of 10 for a given number n.
+    
+    Parameters:
+    n : float
+    
+    Returns:
+    tuple (lo, hi), where lo < n < hi."""
+    
+    lo = n - n%10
+    hi = lo+10
+    return int(lo), int(hi)
+
+def source_file_locator(l_c, b_c):
+    """Returns the file to path of main data file from which a cluster a centroid (l_c, b_c) was extracted"""
+    l_range, b_range = bounds(l_c), bounds(b_c)
+    
+    if b_c<0:
+        disc_position = 'below_disc'
+    else:
+        disc_position = 'above_disc'
+    
+    source_file_path = f'../data/clustering/{disc_position}/{l_range[0]}_{l_range[1]}_{b_range[0]}_{b_range[1]}-result.fits.gz'
+    return source_file_path
