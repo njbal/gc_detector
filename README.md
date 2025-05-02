@@ -24,3 +24,5 @@ This work makes use of several packages including, but not limited to:
 - [`scikit-learn`](https://scikit-learn.org/stable/) 1.3.0
 - [`scipy`](https://docs.scipy.org/doc/scipy/) 1.11.1
 - [`tensorflow`](https://www.tensorflow.org/api_docs) 2.15.0
+
+We also utilised the [`gaia_zeropoint`](https://gitlab.com/icc-ub/public/gaiadr3_zeropoint) parallax correction function by [Lindegren et al. (2021)](https://ui.adsabs.harvard.edu/abs/2021A%26A...649A...4L/abstract). We discuss in our paper how we dealt with this functions tendency for overcorrections.
