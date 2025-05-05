@@ -27,8 +27,8 @@ def radial_mle(file_path, r_lower, r_upper, priors, p0):
     Parameters:
     
     file_path: path to the cluster membership list file
-    r_lower: minimum radius, from cluster centre, at which the radial profile must begin.
-    r_upper: maximum radius, from cluster centre, at which the radial profile ends
+    r_lower: minimum radius (arcmin), from cluster centre, at which the radial profile must begin.
+    r_upper: maximum radius (arcmin), from cluster centre, at which the radial profile ends
     priors: prior distribution (uniform), with specified bounds for each fit parameter 
     p0: initial guess"""
     
@@ -41,42 +41,36 @@ def radial_mle(file_path, r_lower, r_upper, priors, p0):
     y = np.cos(dec.mean())*np.sin(dec) - np.sin(dec.mean())*np.cos(dec)*np.cos(ra-ra.mean())
     R = (x**2 + y**2)**0.5*(180/np.pi*60) # R in arcmin!
 
-    bws = [0.4e-2, 0.5e-2, 1e-1]
+    diff = r_upper - r_lower
+    bws = [0.125e-2*diff, 0.25e-2*diff, 0.5e-2*diff]
     N_array = np.array([])
     r_array = np.array([])
 
-    r_lo, r_hi = 0.001, 20
-
     for bw0 in bws:
-    #     bw0 = 1e-1 #  bin width
-        r_bins = np.arange(r_lo, r_hi + bw0, bw0)
+        r_bins = np.arange(r_lower, r_upper + bw0, bw0)
         for r in r_bins[:-1]:
             N = len(R[(R<=r+bw0)&(R>r)])/(np.pi*((r+bw0)**2 - r**2))
             N_array = np.append(N_array, N)
             r_array = np.append(r_array, r)
 
+    bw1 = 2e-1*diff
 
-    N_array_nz = N_array[(N_array>0)] # Non-zero N(r) values
-    r_array_nz = r_array[(N_array>0)] # corresponding r values
-
-    bw1 = 5e-1
-
-    r_bins1 = np.arange(r_lo, r_hi + bw1, bw1)
+    r_bins1 = np.arange(r_lower, r_upper + bw1, bw1)
 
     N_new = np.array([])
     eN_new = np.array([])
     r_new = np.array([])
     for r_ in r_bins1[:-1]:
-        final_ind = (r_array_nz<=r_+bw1)&(r_array_nz>r_)
-        N_vals = N_array_nz[final_ind]
+        final_ind = (r_array<=r_+bw1)&(r_array>r_)
+        N_vals = N_array[final_ind]
 
         if N_vals.size<=1:
             continue
         else: 
             N_mean = N_vals.mean()
-            eN = np.sqrt(N_mean/N_vals.size)
-            N_new = np.append(N_new, N_mean)
-            eN_new = np.append(eN_new, eN)
+            eN = np.sqrt(N_mean/N_vals.size) # poissonian errors
+            N_new = np.append(N_new, N_mean) 
+            eN_new = np.append(eN_new, eN) 
             r_new = np.append(r_new, r_+0.5*bw1)
 
     # Log-Likelihood Function for MCMC
@@ -104,8 +98,7 @@ def radial_mle(file_path, r_lower, r_upper, priors, p0):
 
     pos = p0 + 1e-4 * np.random.randn(nwalkers, ndim)  # Slightly perturb initial guess
 
-    r_ind = (r_new>r_lower)&(r_new<r_upper)
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, args=(r_new[r_ind], N_new[r_ind], eN_new[r_ind]))
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, args=(r_new, N_new, eN_new))
 
 
     # Run MCMC
@@ -115,31 +108,39 @@ def radial_mle(file_path, r_lower, r_upper, priors, p0):
     # Extract Results
     samples = sampler.get_chain(discard=2000, thin=10, flat=True)
     
-    return samples, r_new[r_ind], N_new[r_ind], eN_new[r_ind]
+    return samples, r_new, N_new, eN_new
 
 
 # corner plot function:
-def corner_plot(file_path, samples, r_lower, r_upper):
+def corner_plot(file_path, rad_profile, r_lower, r_upper):
+    samples, rvals, Nvals, e_Nvals = rad_profile 
+    # samples: MCMC samples
+    # rvals: radius values from radial profile
+    # Nvals: surface density values from radial profile
+    # e_Nvals: errors in surface densitys
+
     clus_name = file_path.split('/')[-1][:-5]
     
-    best_fit = np.median(samples[0], axis=0)
-    error_hi = np.percentile(samples[0], 84, axis=0) - best_fit # upper error
-    error_lo = best_fit - np.percentile(samples[0], 16, axis=0) # lower error
+    best_fit = np.median(samples, axis=0)
+    error_hi = np.percentile(samples, 84, axis=0) - best_fit # upper error
+    error_lo = best_fit - np.percentile(samples, 16, axis=0) # lower error
     error_ab = (error_hi**2 + error_lo**2)**0.5 # total error
 
     # Plot Results
     fig, ax1 = plt.subplots(figsize=(8,6))
-    ax1.errorbar(samples[1], samples[2], yerr=samples[3], 
-                 capsize=2, lw=0, elinewidth=1, 
-                 ecolor='red', marker='s', 
-                 color='black', label="Data", ms=2)
-    rfit = np.linspace(r_lower, r_upper, 1000)
+    ax1.errorbar(rvals, Nvals, yerr=e_Nvals, 
+                 capsize=2, lw=0, elinewidth=1.5, 
+                 ecolor='red', marker='.', 
+                 color='black', label="Data", ms=3)
+    
+    plot_xlim = [1e-1,5e1]
+    rfit = np.linspace(*plot_xlim, 1000)
     ax1.plot(rfit, King(rfit, *best_fit), label="MCMC Fit", color="blue")
     
     # Compute model uncertainty using MCMC samples
-    n_samples_to_draw = 1000
-    sample_inds = np.random.choice(len(samples[0]), n_samples_to_draw, replace=False)
-    model_curves = np.array([King(rfit, *samples[0][i]) for i in sample_inds])
+    n_samples_to_draw = 2500
+    sample_inds = np.random.choice(len(samples), n_samples_to_draw, replace=False)
+    model_curves = np.array([King(rfit, *samples[i]) for i in sample_inds])
 
     # Compute percentiles at each radius
     lower = np.percentile(model_curves, 16, axis=0)
@@ -150,13 +151,14 @@ def corner_plot(file_path, samples, r_lower, r_upper):
     ensure_dir(results_dir)
 
     # Plot shaded 1-sigma region
-    ax1.fill_between(rfit, lower, upper, color='blue', alpha=0.3, label=r'$1\sigma$ band')
+    ax1.fill_between(rfit, lower, upper, color='blue', alpha=0.2, label=r'$1\sigma$ band')
     
+    ax1.set_xscale('log')
     ax1.set_yscale('log')
     ax1.set_xlabel(r'$r \rm \ [arcmin]$', size=16)
     ax1.set_ylabel(r'$N_{\rm stars}/\rm arcmin^2$', size=16)
     ax1.legend()
-    ax1.set_xlim(r_lower, r_upper)
+    ax1.set_xlim(*plot_xlim)
     fig.suptitle(f'{clus_name}', size=24)
     fig.tight_layout()
     plt.savefig(f'{results_dir}{clus_name} - MCMC fit.png')
@@ -175,7 +177,7 @@ def corner_plot(file_path, samples, r_lower, r_upper):
               r'$r_t \ \rm [arcmin]$', 
               r'$\eta \rm \ [arcmin^{-2}]$']
     
-    fig_corner = corner.corner(samples[0], labels=labels, quantiles=[0.16,0.5,0.84], truths=best_fit,
+    fig_corner = corner.corner(samples, labels=labels, quantiles=[0.16,0.5,0.84], truths=best_fit,
                                show_titles=True, title_fmt=".3f", title_kwargs={"fontsize": 12}, 
                                smooth=True, 
                                label_kwargs={'fontsize':14})
