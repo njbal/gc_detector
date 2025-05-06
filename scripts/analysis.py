@@ -100,7 +100,6 @@ def radial_mle(file_path, r_lower, r_upper, priors, p0):
 
     sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, args=(r_new, N_new, eN_new))
 
-
     # Run MCMC
     nsteps = 10000
     sampler.run_mcmc(pos, nsteps, progress=True)
